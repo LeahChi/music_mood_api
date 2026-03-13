@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
 
+# --- User schemas ---
 
 class UserCreate(BaseModel):
     username: str
@@ -32,18 +33,19 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-# Track schemas
+
+# --- Track schemas --- 
 
 class TrackCreate(BaseModel):
     title: str
     artist: str
     genre: Optional[str] = None
-    valence: Optional[float] = None     # 0.0 = sad, 1.0 = happy
-    energy: Optional[float] = None      # 0.0 = calm, 1.0 = energetic
+    valence: Optional[float] = None      # 0.0 = sad, 1.0 = happy
+    energy: Optional[float] = None       # 0.0 = calm, 1.0 = energetic
     danceability: Optional[float] = None # 0.0 = not danceable, 1.0 = danceable
-    tempo: Optional[float] = None       # BPM (beats per minute)
-    duration_ms: Optional[int] = None  # Duration in milliseconds
-    spotify_id: Optional[str] = None          # Spotify's unique track ID
+    tempo: Optional[float] = None        # BPM (beats per minute)
+    duration_ms: Optional[int] = None    # Duration in milliseconds
+    spotify_id: Optional[str] = None     # Spotify's unique track ID
 
 # What gets sent back when returning a track
 class TrackResponse(BaseModel):
@@ -59,7 +61,7 @@ class TrackResponse(BaseModel):
     spotify_id: Optional[str] = None
 
     class Config:
-        from_attributes = True # Tells Pydantic to read data from SQLAlchemy models
+        from_attributes = True            # Tells Pydantic to read data from SQLAlchemy models
 
 # When someone wants to update a track
 class TrackUpdate(BaseModel):
@@ -71,3 +73,23 @@ class TrackUpdate(BaseModel):
     danceability: Optional[float] = None
     tempo: Optional[float] = None
     duration_ms: Optional[int] = None
+
+
+# --- Session schemas ---
+
+# When a user logs a listening session, they just provide the track_id and context — everything else is automatic
+class SessionCreate(BaseModel):
+    track_id: int                        # which track they listened to
+    context: str = "other"               # what they were doing e.g. "working", "commuting"
+
+# What we send back when returning a session
+class SessionResponse(BaseModel):
+    id: int
+    user_id: int
+    track_id: int
+    listened_at: datetime                 # when they listened to the track (automatically set)
+    context: str                          # what context they were in
+
+    class Config:
+        from_attributes = True
+        use_enum_values = True            # converts enum to plain string in response
