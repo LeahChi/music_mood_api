@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.routers import users, tracks, sessions, analytics
+from app.routers import users, tracks, sessions, analytics, ai
 
 # Scans all models and creates the matching tables in musicmood.db
 # If the tables already exist, it skips them
@@ -17,6 +17,7 @@ app.include_router(users.router)     # include the authentication routes from us
 app.include_router(tracks.router)    # include the track management routes from tracks.py
 app.include_router(sessions.router)  # include the listening session routes from sessions.py
 app.include_router(analytics.router) # include the analytics routes from analytics.py
+app.include_router(ai.router)        # include the AI insights routes from ai.py
 
 @app.get("/")
 def root():
