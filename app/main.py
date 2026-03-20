@@ -33,7 +33,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/ui")
 def serve_ui():
-    # serves musicmood_ui.html at http://127.0.0.1:8000/ui
     return FileResponse("static/musicmood_ui.html")
 
 # --- Global Error Handlers ---
@@ -90,10 +89,9 @@ app.include_router(sessions.router)  # include the listening session routes from
 app.include_router(analytics.router) # include the analytics routes from analytics.py
 app.include_router(ai.router)        # include the AI insights routes from ai.py
 
+
 @app.get("/")
 def root():
-    return {
-        "message": "Welcome to MusicMood API",
-        "docs": "/docs",        # Swagger UI — all endpoints documented here automatically
-        "version": "1.0.0"
-    }
+    return FileResponse("static/musicmood_ui.html")
+        # "docs": "/docs",        # Swagger UI — all endpoints documented here automatically
+    
