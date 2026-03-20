@@ -25,6 +25,25 @@ def get_tracks(
         query = query.filter(Track.genre == genre)
     return query.limit(limit).all()
 
+# GET search tracks by title or artist 
+@router.get("/search", response_model=List[TrackResponse])
+def search_tracks(
+    q: str,
+    limit: int = 10,
+    db: Session = Depends(get_db)
+):
+    # searches title and artist fields for the query string
+    results = (
+        db.query(Track)
+        .filter(
+            Track.title.ilike(f"%{q}%") |
+            Track.artist.ilike(f"%{q}%")
+        )
+        .limit(limit)
+        .all()
+    )
+    return results
+
 # GET a single track by ID
 @router.get("/{track_id}", response_model=TrackResponse)
 def get_track(track_id: int, db: Session = Depends(get_db)):
@@ -89,3 +108,5 @@ def delete_track(
     db.delete(track)
     db.commit()
     # 204 means success with no content returned
+
+

@@ -1,8 +1,12 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from app.database import engine, Base
 from app.routers import users, tracks, sessions, analytics, ai
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 # Scans all models and creates the matching tables in musicmood.db
 # If the tables already exist, it skips them
@@ -15,6 +19,22 @@ app = FastAPI(
     description="A music listening analytics API that explores mood-linked and context-aware listening patterns through AI-generated reflective summaries.",
     version="1.0.0"
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # allows any origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# serve the UI files through FastAPI so the browser can load JS files properly
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/ui")
+def serve_ui():
+    # serves musicmood_ui.html at http://127.0.0.1:8000/ui
+    return FileResponse("static/musicmood_ui.html")
 
 # --- Global Error Handlers ---
 # These catch errors across ALL endpoints automatically

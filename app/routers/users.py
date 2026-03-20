@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import User
 from app.schemas.schemas import UserCreate, UserResponse, Token
-from app.auth import hash_password, verify_password, create_access_token
+from app.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(
     prefix="/auth",
@@ -49,3 +49,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     # Creates and returns the JWT token
     access_token = create_access_token(data={"sub": db_user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me", response_model=UserResponse)
+def get_me(current_user: User = Depends(get_current_user)):
+    # returns the currently logged in user's details
+    # used by the UI to get the user's ID after login
+    return current_user

@@ -99,6 +99,7 @@ def interpret_listening(
 
     # step 1: build analytics from our own database
     analytics = build_analytics_summary(user_id, db)
+    analytics["username"] = current_user.username  # added username to analytics for a more personalised AI response
     if not analytics:
         raise HTTPException(status_code=404, detail="No listening data found for this user")
 

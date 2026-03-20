@@ -5,41 +5,53 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # initialise the Groq client with our API key
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+# Groq client only initialises when an AI endpoint is actually called, not at startup
+client = None
+
+def get_client():
+    global client
+    if client is None:
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    return client
 
 def interpret_mood(analytics_data: dict) -> str:
     """
     Takes pre-computed analytics from our own endpoints and asks
     Llama 3 to interpret them in natural language.
     """
+    username = analytics_data.get('username', 'you') #  making the result more personalised
 
     # build a structured prompt from our analytics data
+    
     prompt = f"""
-    You are a music psychology analyst. Based on the following listening analytics, 
-    provide a thoughtful, non-clinical interpretation of this person's mood-linked 
-    listening patterns.
+    You are a music psychology analyst speaking directly to {username}.
+    Address them as "you" throughout — never say "this person".
+    Be warm, personal and conversational.
 
-    User Listening Analytics:
+    {username}'s listening analytics:
     - Overall mood score: {analytics_data.get('overall_mood_score')} (0=very negative, 1=very positive)
     - Dominant emotion: {analytics_data.get('dominant_emotion')}
     - Most listened genre: {analytics_data.get('top_genre')}
-    - Favourite context: {analytics_data.get('favourite_context')} (when they listen most)
-    - Average energy level: {analytics_data.get('avg_energy')} (0=calm, 1=intense)
-    - Average danceability: {analytics_data.get('avg_danceability')} (0=least, 1=most)
+    - Favourite context: {analytics_data.get('favourite_context')}
+    - Average energy level: {analytics_data.get('avg_energy')}
+    - Average danceability: {analytics_data.get('avg_danceability')}
     - Total sessions analysed: {analytics_data.get('total_sessions')}
     - Top track: "{analytics_data.get('top_track_title')}" by {analytics_data.get('top_track_artist')}
 
     Please provide:
-    1. A 2-3 sentence interpretation of their overall mood-linked listening pattern
-    2. What their favourite context ({analytics_data.get('favourite_context')}) suggests about how they use music
-    3. One reflective insight about their top track choice
+    1. A 2-3 sentence personal interpretation of their mood-linked listening pattern
+    2. What their favourite context suggests about how they use music
+    3. One personal insight about their top track choice
 
-    Important: This is a non-clinical, reflective summary for personal insight only.
-    Keep it warm, thoughtful and concise. Do not diagnose or make medical claims.
+    Important: Speak directly to {username} using "you" and "your".
+    Non-clinical, warm and concise. No bullet numbers — write in flowing paragraphs.
+    Keep it under 150 words total.
     """
 
     try:
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model="llama-3.3-70b-versatile",  # groq's free model
             messages=[
                 {
@@ -115,7 +127,7 @@ def recommend_context(analytics_data: dict) -> str:
     """
 
     try:
-        response = client.chat.completions.create(
+        response = get_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
                 {
