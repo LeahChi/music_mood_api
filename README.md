@@ -5,8 +5,8 @@ A music listening analytics API that combines user listening history with real S
 > **Live API:** https://musicmoodapi-production.up.railway.app/
 > **Swagger Docs:** https://musicmoodapi-production.up.railway.app/docs
 > **API Documentation PDF:** [`api_docs.pdf`](api_docs.pdf)
-> **Technical Report:** [Link to report]
-> **Presentation Slides:** ['presentation'](MusicMood_Presentation.pdf)
+> **Technical Report:** [report](TechnicalReport_201698979.pdf)
+> **Presentation Slides:** [presentation](MusicMood_Presentation.pdf)
 
 ---
 
